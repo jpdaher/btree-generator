@@ -3,17 +3,17 @@
 
 #include <stdbool.h>
 
-#define TAM 5
+#define TAM 5 // Ordem da árvore (m)
 
 typedef struct Registro{
     int matricula;
-    long byte_offset;
+    long byte_offset;// Localização exata no arquivo de texto
 }Registro;
 
 typedef struct btree{
     Registro dados[TAM - 1];
     struct btree *children[TAM];
-    int n;
+    int n; // Quantidade atual de chaves
     bool leaf;
 } btree;
 
