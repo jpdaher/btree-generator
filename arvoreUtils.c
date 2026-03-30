@@ -22,22 +22,47 @@ btree* load_tree_from_txt(const char* file_name) {
     return root;
 }
 
-static void print_node_to_file(btree* node, FILE* out) {
+static void print_node_to_file(btree* node, FILE* out, int nivel) {
     if (!node) return;
-    fprintf(out, "Chaves: ");
-    for (int i = 0; i < node->n; i++) fprintf(out, "%d ", node->dados[i].matricula);
-    fprintf(out, "| Folha: %s\n", node->leaf ? "Sim" : "Nao");
-    
+
+    // Imprime o nível, o endereço do nó atual e se é folha
+    fprintf(out, "[Nivel %d] No: %p | Folha: %s\n", 
+            nivel, (void*)node, node->leaf ? "Sim" : "Nao");
+
+    // Imprime as chaves e seus respectivos offsets
+    fprintf(out, "   Chaves (Matricula:Offset): ");
+    for (int i = 0; i < node->n; i++) {
+        fprintf(out, "[%d:%ld] ", node->dados[i].matricula, node->dados[i].byte_offset);
+    }
+    fprintf(out, "\n   Filhos: ");
+
+    // Imprime os endereços dos filhos para conferência
     if (!node->leaf) {
-        for (int i = 0; i <= node->n; i++) print_node_to_file(node->children[i], out);
+        for (int i = 0; i <= node->n; i++) {
+            fprintf(out, "%p ", (void*)node->children[i]);
+        }
+        fprintf(out, "\n\n");
+
+        // Chamada recursiva para os filhos aumentando o nível
+        for (int i = 0; i <= node->n; i++) {
+            print_node_to_file(node->children[i], out, nivel + 1);
+        }
+    } else {
+        fprintf(out, "Nenhum\n\n");
     }
 }
 
+// Função principal de salvamento
 bool save_tree_to_txt(btree* root, const char* output_file_name) {
     FILE* out = fopen(output_file_name, "w");
     if (!out) return false;
-    fprintf(out, "Raiz: %p\n", (void*)root); // Endereço da raiz conforme pedido [cite: 11]
-    print_node_to_file(root, out);
+
+    fprintf(out, "--- ESTRUTURA DA ARVORE B (ORDEM %d) ---\n", TAM);
+    fprintf(out, "Endereco da Raiz: %p\n\n", (void*)root);
+
+    // Iniciamos a recursão com nível 0
+    print_node_to_file(root, out, 0);
+
     fclose(out);
     return true;
 }

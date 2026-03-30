@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include "arvoreb.h"
@@ -38,6 +39,11 @@ int main() {
             printf("Matricula: "); scanf("%d", &mat);
             printf("Nome: "); scanf(" %[^\n]", nome);
             printf("Telefone: "); scanf(" %[^\n]", tel);
+
+            if (search_node(root, mat) != NULL) {
+              printf("Erro: Matricula já cadastrada!\n");
+              continue;
+            }
 
             // Abre o arquivo em modo leitura/escrita para checar o fim do arquivo
             FILE* f = fopen(ARQUIVO_REGISTROS, "r+");
